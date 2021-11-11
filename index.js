@@ -25,7 +25,6 @@ app.use(express.json());
 // database uri
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dyvua.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
-
 // database client object
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -36,9 +35,14 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    console.log("Coonected database");
+    console.log("Connected database");
     const database = client.db("shopGrids");
     const userCollection = database.collection("users");
+
+    // ROOT API
+    app.get("/users", (req, res) => {
+      res.send("User get API Calling");
+    });
 
     // create a document to insert
     // const doc = {
@@ -47,7 +51,6 @@ async function run() {
     // };
     //const result = await haiku.insertOne(doc);
     //console.log(`A document was inserted with the _id: ${result.insertedId}`);
-
   } finally {
     //await client.close();
   }

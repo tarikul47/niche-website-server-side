@@ -2,7 +2,7 @@ const express = require("express");
 // mongoclient
 const { MongoClient } = require("mongodb");
 // mongo db id
-//const ObjectId = require('mongodb').ObjectId;
+const ObjectId = require("mongodb").ObjectId;
 
 // corros conncetion
 const cors = require("cors");
@@ -38,19 +38,63 @@ async function run() {
     console.log("Connected database");
     const database = client.db("shopGrids");
     const userCollection = database.collection("users");
+    const productsCollection = database.collection("products");
+    const reviewsCollection = database.collection("reviews");
+
+    // Product POST API
+    app.post("/products", async (req, res) => {
+      const product = req.body;
+      const result = await productsCollection.insertOne(product);
+      res.json(result);
+      console.log("hitting product post api", product);
+    });
+
+    // Product GET API
+    app.get("/products", async (req, res) => {
+      const cursor = productsCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result);
+    });
+
+    // Product GET API BY ID
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await productsCollection.findOne(query);
+      res.json(result);
+    });
+
+
+    // Product DELETE API
+    app.delete("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const product = await productsCollection.deleteOne(query);
+      res.json(product);
+      //console.log('API hit', id);
+    });
+
+    // Reviews POST API
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      res.json(result);
+      //console.log("hitting review post api", review);
+    });
+
+
+     // Product GET API
+     app.get("/reviews", async (req, res) => {
+      const cursor = reviewsCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result);
+    });
 
     // ROOT API
     app.get("/users", (req, res) => {
       res.send("User get API Calling");
     });
 
-    // create a document to insert
-    // const doc = {
-    //   title: "Record of a Shriveled Datum",
-    //   content: "No bytes, no problem. Just insert a document, in MongoDB",
-    // };
-    //const result = await haiku.insertOne(doc);
-    //console.log(`A document was inserted with the _id: ${result.insertedId}`);
   } finally {
     //await client.close();
   }

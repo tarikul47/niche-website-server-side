@@ -40,6 +40,7 @@ async function run() {
     const userCollection = database.collection("users");
     const productsCollection = database.collection("products");
     const reviewsCollection = database.collection("reviews");
+    const ordersCollection = database.collection("orders");
 
     // Product POST API
     app.post("/products", async (req, res) => {
@@ -83,12 +84,28 @@ async function run() {
     });
 
 
-     // Product GET API
+     // Reviews GET API
      app.get("/reviews", async (req, res) => {
       const cursor = reviewsCollection.find({});
       const result = await cursor.toArray();
       res.json(result);
     });
+
+     // Order POST API
+     app.post("/orders", async (req, res) => {
+      const order = req.body;
+      const result = await ordersCollection.insertOne(order);
+      res.json(result);
+      //console.log("hitting order post api", order);
+    });
+
+    // Orders GET API
+    app.get("/orders", async (req, res) => {
+      const cursor = ordersCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result);
+    });
+
 
     // ROOT API
     app.get("/users", (req, res) => {

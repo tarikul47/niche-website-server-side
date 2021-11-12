@@ -42,6 +42,21 @@ async function run() {
     const reviewsCollection = database.collection("reviews");
     const ordersCollection = database.collection("orders");
 
+    // User POST API
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.json(result);
+      //console.log("hitting product post api", user);
+    });
+
+    // User GET API
+    app.get("/users", async (req, res) => {
+      const cursor = userCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result);
+    });
+
     // Product POST API
     app.post("/products", async (req, res) => {
       const product = req.body;
@@ -65,7 +80,6 @@ async function run() {
       res.json(result);
     });
 
-
     // Product DELETE API
     app.delete("/products/:id", async (req, res) => {
       const id = req.params.id;
@@ -83,16 +97,15 @@ async function run() {
       //console.log("hitting review post api", review);
     });
 
-
-     // Reviews GET API
-     app.get("/reviews", async (req, res) => {
+    // Reviews GET API
+    app.get("/reviews", async (req, res) => {
       const cursor = reviewsCollection.find({});
       const result = await cursor.toArray();
       res.json(result);
     });
 
-     // Order POST API
-     app.post("/orders", async (req, res) => {
+    // Order POST API
+    app.post("/orders", async (req, res) => {
       const order = req.body;
       const result = await ordersCollection.insertOne(order);
       res.json(result);
@@ -106,10 +119,35 @@ async function run() {
       res.json(result);
     });
 
+    // Orders GET API  by user email
+    app.get("/orders/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const cursor = ordersCollection.find(query);
+      const result = await cursor.toArray();
+      res.json(result);
+    });
 
-    // ROOT API
-    app.get("/users", (req, res) => {
-      res.send("User get API Calling");
+    // Order DELETE API
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const order = await ordersCollection.deleteOne(query);
+      res.json(order);
+      //console.log('API hit', id);
+    });
+
+    // ORDER STATUS UPDATE PUT API
+    app.put("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body.status;
+      const order = await ordersCollection.updateOne(
+        { _id: ObjectId(id) },
+        { $set: { status: data } },
+        { upsert: true }
+      );
+      res.json(order);
+      // console.log("Order put api hit", id, data);
     });
 
   } finally {

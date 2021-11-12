@@ -57,6 +57,27 @@ async function run() {
       res.json(result);
     });
 
+    // User GET API by email
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      res.json(user);
+    });
+
+    // USER Admin Role UPDATE PUT API
+    app.put("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const data = req.body.role;
+      const order = await userCollection.updateOne(
+        { email: email },
+        { $set: { role: data } },
+        { upsert: true }
+      );
+      res.json(order);
+      // console.log("Order put api hit", id, data);
+    });
+
     // Product POST API
     app.post("/products", async (req, res) => {
       const product = req.body;
@@ -149,7 +170,6 @@ async function run() {
       res.json(order);
       // console.log("Order put api hit", id, data);
     });
-
   } finally {
     //await client.close();
   }

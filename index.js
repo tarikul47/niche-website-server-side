@@ -86,9 +86,19 @@ async function run() {
       console.log("hitting product post api", product);
     });
 
+    /*
     // Product GET API
     app.get("/products", async (req, res) => {
       const cursor = productsCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result);
+    });
+   */
+
+    // Product GET API by limit count
+    app.get("/products/:count", async (req, res) => {
+      const count = parseInt(req.params.count);
+      const cursor = productsCollection.find({}).limit(count);
       const result = await cursor.toArray();
       res.json(result);
     });
